@@ -1,0 +1,44 @@
+{
+  "name": "react-use-signal",
+  "version": "1.0.0",
+  "main": "dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "react",
+    "hook",
+    "signal",
+    "state",
+    "transition",
+    "deferred"
+  ],
+  "author": "Rayen Boussayed rynbsd04@gmail.com",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/RYNBSD/react-use-signal.git"
+  },
+  "description": "",
+  "devDependencies": {
+    "@types/react": "^19.0.8",
+    "typescript": "^5.7.3"
+  },
+  "peerDependencies": {
+    "react": ">=18.0.0"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}
