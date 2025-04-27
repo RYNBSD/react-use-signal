@@ -1,184 +1,92 @@
-# react-use-signal 🔄
+# useSignal
 
-A performant React hook for managing state transitions and deferred updates with surgical control.
+A lightweight React hook for smooth and deferred state updates using React’s `useTransition` and `useDeferredValue`.
 
-Signals are renowned for their efficiency in performance-critical applications, enabling precise, minimal re-renders by targeting only specific components. This level of optimization has traditionally been unattainable within React's existing architecture. However, today marks a turning point—now, using only built-in React hooks, you can achieve unprecedented render minimization, significantly enhancing application performance.
-
-## Table of Contents 📑
-
-- [Features](#-features)
-- [Installation](#-installation)
-- [Usage](#-usage)
-- [Examples](#-examples)
-- [Comparison with useState](#-comparison-with-usestate)
-- [API Reference](#-api-reference)
-- [Performance](#-performance)
-- [Contributing](#-contributing)
-- [License](#-license)
-
-## 🌟 Features
-
-- Automatic transition management
-- Configurable deferred value strategy
-- Zero-dependency implementation
-- TypeScript first-class support
-- React 18+ optimized
-- DevTools integration
-
-## 📦 Installation
+## Installation
 
 ```bash
-npm install react-use-signal
+npm install react-signal-hook
 # or
-yarn add react-use-signal
-# or
-pnpm add react-use-signal
-# or
-bun add react-use-signal
+yarn add your-package-name
 ```
 
-## 🚀 Usage
-
-### Basic Example
+## Import
 
 ```tsx
-import useSignal from "react-use-signal";
+import useSignal from "your-package-name";
+```
 
-function App() {
-  const [text, setText] = useSignal("");
+## API
+
+```ts
+useSignal<S>(
+  initialState: S | (() => S),
+  options?: {
+    smoothState?: boolean;   // default: false
+    noTransition?: boolean;  // default: false
+  }
+): [
+  currentState: S,
+  setState: Dispatch<SetStateAction<S>>
+]
+```
+
+- **initialState**: A value or function for the initial state.
+- **options.smoothState**: If `true`, returns immediate state instead of deferred state.
+- **options.noTransition**: If `true`, skips React's transition mechanism on updates.
+
+## Features
+
+- **Deferred updates**: Smooth UI responsiveness using `useDeferredValue`.
+- **Transition control**: Batch updates inside React transitions with `useTransition`.
+- **Flexible behavior**: Toggle smooth or immediate updates via options.
+
+## Examples
+
+### Basic usage
+
+```tsx
+function Counter() {
+  const [count, setCount] = useSignal(0);
 
   return (
-    <div>
-      <input
-        value={text}
-        onChange={(e) => setText(e.target.value)}
-        placeholder="Type here..."
-      />
-      <Results query={text} />
-    </div>
+    <button onClick={() => setCount(c => c + 1)}>
+      Count: {count}
+    </button>
   );
 }
 ```
 
-### Advanced Configuration
+### Immediate state (no defer)
 
 ```tsx
-const [value, setValue] = useSignal(initialValue, {
-  smoothState: true, // Disable deferred value
-  noTransition: true, // Disable transition wrapping
-});
-```
-
-## 📚 Examples
-
-### Search Input with Debouncing
-
-```tsx
-function SearchBox() {
-  const [query, setQuery] = useSignal("");
-
-  const results = useMemo(() => searchAPI(deferredQuery), [deferredQuery]);
+function FastCounter() {
+  // Returns `state` immediately, without deferring
+  const [count, setCount] = useSignal(0, { smoothState: true });
 
   return (
-    <div>
-      <input value={query} onChange={(e) => setQuery(e.target.value)} />
-      <SearchResults results={results} />
-    </div>
+    <button onClick={() => setCount(100)}>
+      Jump to 100: {count}
+    </button>
   );
 }
 ```
 
-### Animation Frame Control
+### Disable transition
 
 ```tsx
-function AnimatedComponent() {
-  const [position, setPosition] = useSignal(0);
+function NoTransitionCounter() {
+  // Updates happen immediately, bypassing transitions
+  const [count, setCount] = useSignal(0, { noTransition: true });
 
-  useFrame(() => {
-    setPosition((p) => p + 1);
-  });
-
-  return <div style={{ transform: `translateX(${position}px)` }} />;
+  return (
+    <button onClick={() => setCount(c => c + 1)}>
+      Instant Count: {count}
+    </button>
+  );
 }
 ```
 
-## ⚖️ Comparison with useState
+## License
 
-### Code Complexity
-
-|                     | useState | useSignal |
-| ------------------- | -------- | --------- |
-| Lines of Code       | 8        | 1         |
-| Transition Handling | Manual   | Automatic |
-| Deferred Values     | Manual   | Built-in  |
-| Update Strategies   | 1        | 4         |
-
-### Performance Characteristics
-
-| Metric               | useState | useSignal |
-| -------------------- | -------- | --------- |
-| Render Cycles        | Higher   | Optimized |
-| Input Responsiveness | Good     | Better    |
-| Jank Potential       | Medium   | Low       |
-
-### When to Choose
-
-| Use Case               | useState         | useSignal      |
-| ---------------------- | ---------------- | -------------- |
-| Simple state           | ✅               | ⚠️ Overkill    |
-| Complex transitions    | ⚠️ Manual        | ✅ Ideal       |
-| High-frequency updates | ⚠️ Possible jank | ✅ Smooth      |
-| Search/Filter UIs      | ⚠️ Possible lag  | ✅ Recommended |
-
-## 📖 API Reference
-
-### `useSignal(initialState, options?)`
-
-```ts
-type Options = {
-  /**
-   * Bypass deferred value for immediate updates
-   * @default false
-   */
-  smoothState?: boolean;
-
-  /**
-   * Disable React transition wrapping
-   * @default false
-   */
-  noTransition?: boolean;
-};
-```
-
-### Return Value
-
-Same as useState.
-
-```ts
-type ReturnType<S> = [state: S, setState: Dispatch<SetStateAction<S>>];
-```
-
-### Configuration Modes
-
-| Mode              | smoothState | noTransition | Use Case                                     |
-| ----------------- | ----------- | ------------ | -------------------------------------------- |
-| Default           | false       | false        | Optimized updates with transitions           |
-| Immediate Updates | true        | true         | Critical state that needs instant reflection |
-| Transition Only   | true        | false        | Batched updates without deferring            |
-| Deferred Only     | false       | true         | Late value without transition API            |
-
-## 🏎️ Performance
-
-### Optimization Strategies
-
-1. **Debounced Updates**: Automatic transition wrapping prevents UI blocking
-2. **Deferred Rendering**: Non-urgent updates don't block main thread
-3. **Memoization Ready**: Stable references for dependency arrays
-
-## 📄 License
-
-MIT © [RB](https://github.com/RYNBSD)
-
----
-
-**Looking for maintainers!** Help us improve this project - reach out if interested in maintaining.
+MIT © RYN BSD
